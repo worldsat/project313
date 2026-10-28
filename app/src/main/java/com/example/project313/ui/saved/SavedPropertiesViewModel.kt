@@ -1,38 +1,61 @@
 package com.example.project313.ui.saved
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.project313.data.mock.MockData
 import com.example.project313.data.model.Estate
+import com.example.project313.data.repository.FirebaseEstateRepository
 import com.example.project313.ui.saved.components.SavedTab
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class SavedPropertiesViewModel : ViewModel() {
+class SavedPropertiesViewModel(
+    private val repository: FirebaseEstateRepository = FirebaseEstateRepository.getInstance()
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         SavedPropertiesUiState(
             savedEstates = MockData.savedEstates,
-            totalSavedCount = 6
+            totalSavedCount = MockData.savedEstates.size
         )
     )
     val uiState: StateFlow<SavedPropertiesUiState> = _uiState.asStateFlow()
+
+    private var allSavedEstates: List<Estate> = MockData.savedEstates
+
+    init {
+        viewModelScope.launch {
+            repository.getEstatesFlow().collect { estates ->
+                val saved = estates.filter {
+                    it.priceDropNotice != null ||
+                    it.openHouseNotice != null ||
+                    it.availabilityTag != null ||
+                    it.id == "the-glass-pavilions" ||
+                    it.id == "emerald-grove-residence"
+                }
+                if (saved.isNotEmpty()) {
+                    allSavedEstates = saved
+                    _uiState.update { state ->
+                        state.copy(
+                            savedEstates = filterByTab(allSavedEstates, state.selectedTab),
+                            totalSavedCount = allSavedEstates.size
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     fun onEvent(event: SavedPropertiesUiEvent) {
         when (event) {
             is SavedPropertiesUiEvent.OnTabSelected -> {
                 _uiState.update { state ->
-                    val filtered = when (event.tab) {
-                        SavedTab.ALL -> MockData.savedEstates
-                        SavedTab.COLLECTIONS -> MockData.savedEstates.take(3)
-                        SavedTab.ALERTS -> MockData.savedEstates.filter {
-                            it.priceDropNotice != null || it.openHouseNotice != null || it.availabilityTag != null
-                        }
-                    }
                     state.copy(
                         selectedTab = event.tab,
-                        savedEstates = filtered
+                        savedEstates = filterByTab(allSavedEstates, event.tab)
                     )
                 }
             }
@@ -45,11 +68,14 @@ class SavedPropertiesViewModel : ViewModel() {
                 }
             }
             is SavedPropertiesUiEvent.OnToggleSave -> {
+                repository.toggleSaveEstate(event.estateId, false)
+                allSavedEstates = allSavedEstates.filter { it.id != event.estateId }
+
                 _uiState.update { state ->
-                    val updated = state.savedEstates.filter { it.id != event.estateId }
+                    val updated = filterByTab(allSavedEstates, state.selectedTab)
                     state.copy(
                         savedEstates = updated,
-                        totalSavedCount = updated.size,
+                        totalSavedCount = allSavedEstates.size,
                         feedbackMessage = "Removed from saved shortlist"
                     )
                 }
@@ -61,22 +87,17 @@ class SavedPropertiesViewModel : ViewModel() {
             }
             is SavedPropertiesUiEvent.OnShareClicked -> {
                 _uiState.update {
-                    it.copy(feedbackMessage = "Listing link copied to clipboard")
+                    it.copy(feedbackMessage = "Estate link copied to clipboard")
                 }
             }
             is SavedPropertiesUiEvent.OnNotesClicked -> {
                 _uiState.update {
-                    it.copy(feedbackMessage = "Opening private client notes...")
+                    it.copy(feedbackMessage = "Opening private notes")
                 }
             }
             is SavedPropertiesUiEvent.OnConsultAdvisorClicked -> {
                 _uiState.update {
-                    it.copy(feedbackMessage = "Consultation requested with advisor Sarah Jenkins")
-                }
-            }
-            is SavedPropertiesUiEvent.OnNewCollectionClicked -> {
-                _uiState.update {
-                    it.copy(feedbackMessage = "Creating new curated collection...")
+                    it.copy(feedbackMessage = "Connecting with private advisor Sarah Jenkins")
                 }
             }
             is SavedPropertiesUiEvent.OnSortClicked -> {
@@ -84,8 +105,18 @@ class SavedPropertiesViewModel : ViewModel() {
                     val sorted = state.savedEstates.reversed()
                     state.copy(
                         savedEstates = sorted,
-                        feedbackMessage = "Estates sorted by recent updates"
+                        feedbackMessage = "Sorted saved properties"
                     )
+                }
+            }
+            is SavedPropertiesUiEvent.OnNewCollectionClicked -> {
+                _uiState.update {
+                    it.copy(feedbackMessage = "Create collection dialog opened")
+                }
+            }
+            is SavedPropertiesUiEvent.OnViewAllCollectionsClicked -> {
+                _uiState.update {
+                    it.copy(feedbackMessage = "Viewing all curated collections")
                 }
             }
             is SavedPropertiesUiEvent.OnDismissFeedback -> {
@@ -94,7 +125,25 @@ class SavedPropertiesViewModel : ViewModel() {
             is SavedPropertiesUiEvent.OnNotificationsClicked -> {
                 _uiState.update { it.copy(unreadNotificationsCount = 0) }
             }
-            else -> {}
+            is SavedPropertiesUiEvent.OnProfileClicked -> {
+                // Profile action
+            }
+            is SavedPropertiesUiEvent.OnEstateClicked -> {
+                // Handled in NavHost
+            }
+            is SavedPropertiesUiEvent.OnNavigationTabSelected -> {
+                _uiState.update { it.copy(currentNavigationTab = event.tab) }
+            }
+        }
+    }
+
+    private fun filterByTab(estates: List<Estate>, tab: SavedTab): List<Estate> {
+        return when (tab) {
+            SavedTab.ALL -> estates
+            SavedTab.COLLECTIONS -> estates.take(3)
+            SavedTab.ALERTS -> estates.filter {
+                it.priceDropNotice != null || it.openHouseNotice != null || it.availabilityTag != null
+            }
         }
     }
 }

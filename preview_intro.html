@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview: VerdantIntroScreen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1B4332;
+            --on-primary: #FFFFFF;
+            --secondary-container: #D8F3DC;
+            --background: #F8FAF7;
+            --outline: #707972;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-serif: 'Playfair Display', Georgia, serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background: #09130E;
+            color: #E2ECE5;
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Nav Header */
+        header {
+            width: 100%;
+            background: #060D09;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .screen-nav {
+            display: flex;
+            gap: 6px;
+            background: #121E17;
+            padding: 4px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #8DA99A;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 50px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #FFF;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link.active {
+            background: var(--primary);
+            color: #FFF;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            padding: 30px 16px 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .meta-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 390px;
+            padding: 0 4px;
+        }
+
+        .meta-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #D4E4DC;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .meta-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #40916C;
+        }
+
+        .meta-badge {
+            font-size: 11px;
+            color: #6C8578;
+            background: #121E17;
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Phone Frame */
+        .phone-frame {
+            width: 390px;
+            height: 844px;
+            background: #000;
+            border-radius: 44px;
+            padding: 10px;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.12), 0 0 30px rgba(27, 67, 50, 0.2);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 36px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: var(--background);
+        }
+
+        .camera-punch {
+            width: 11px;
+            height: 11px;
+            background: #000;
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 14px;
+            z-index: 101;
+        }
+
+        .status-bar {
+            height: 42px;
+            padding: 0 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 100;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            color: #FFFFFF;
+            pointer-events: none;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-icons svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        .nav-home-bar {
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 4px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.4);
+            z-index: 99;
+            pointer-events: none;
+        }
+
+        .screen-scroll-view {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+            scrollbar-width: none;
+        }
+
+        .screen-scroll-view::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Intro Screen Styles */
+        .intro-screen-bg {
+            min-height: 844px;
+            background: linear-gradient(180deg, #071B12 0%, #09281C 35%, #143828 70%, #0A2317 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-top: 48px;
+            position: relative;
+        }
+
+        .intro-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+        }
+
+        .frosted-pill-badge {
+            background: rgba(214, 239, 224, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50px;
+            padding: 4px 14px 4px 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .frosted-pill-badge .icon-bubble {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #0F764C;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .frosted-pill-badge span {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.1px;
+            color: #E2F5EA;
+        }
+
+        .skip-tour-btn {
+            font-size: 13.5px;
+            font-weight: 500;
+            color: #C0E2D1;
+            padding: 6px 12px;
+            border-radius: 50px;
+            cursor: pointer;
+        }
+
+        .intro-hero-visual {
+            height: 330px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .radar-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(126, 212, 162, 0.22);
+            pointer-events: none;
+        }
+
+        .radar-ring.outer { width: 304px; height: 304px; }
+        .radar-ring.mid { width: 240px; height: 240px; border-color: rgba(126, 212, 162, 0.35); }
+        .radar-disc {
+            width: 176px;
+            height: 176px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(50, 120, 85, 0.3) 0%, rgba(20, 66, 44, 0.18) 60%, rgba(11, 43, 27, 0.08) 100%);
+            border: 1.5px solid rgba(138, 219, 176, 0.38);
+            position: absolute;
+        }
+
+        .central-sanctuary {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .villa-icon-squircle {
+            width: 54px;
+            height: 54px;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #6ED998 0%, #45A86E 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            margin-bottom: 12px;
+        }
+
+        .satellite-pill {
+            position: absolute;
+            background: #D6E4DB;
+            border-radius: 50px;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #133627;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+            z-index: 3;
+        }
+
+        .satellite-pill.top-right {
+            top: 60px;
+            right: 40px;
+        }
+
+        .satellite-pill.bottom-left {
+            bottom: 60px;
+            left: 36px;
+        }
+
+        .intro-bottom-card {
+            background: #D6E1DB;
+            border-radius: 32px;
+            margin: 0 16px 16px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .intro-stepper-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .stepper-pill {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .step-bar {
+            width: 22px;
+            height: 4px;
+            border-radius: 50px;
+            background: var(--primary);
+        }
+
+        .step-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #88D8AC;
+        }
+
+        .intro-headline {
+            font-family: var(--font-serif);
+            font-size: 26px;
+            line-height: 33px;
+            font-weight: 700;
+            color: #132B20;
+            margin-bottom: 8px;
+        }
+
+        .intro-desc {
+            font-size: 13px;
+            line-height: 19px;
+            color: #456052;
+            margin-bottom: 18px;
+        }
+
+        .btn-primary-pill {
+            width: 100%;
+            height: 54px;
+            border-radius: 50px;
+            background: var(--primary);
+            color: #FFFFFF;
+            border: none;
+            font-family: var(--font-sans);
+            font-size: 14.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(27, 67, 50, 0.35);
+        }
+
+        .intro-footer-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 16px;
+        }
+
+        .intro-subtext {
+            text-align: center;
+            font-size: 11px;
+            color: #7FA392;
+            padding: 0 20px 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-weight: 700; font-size: 15px; color: #FFF; display: flex; align-items: center; gap: 8px;">
+            <div style="width: 28px; height: 28px; border-radius: 8px; background: var(--primary); display: flex; align-items: center; justify-content: center;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            </div>
+            Verdant Estates Previews
+        </div>
+
+        <nav class="screen-nav">
+            <a href="preview_intro.html" class="nav-link active">1. Intro</a>
+            <a href="preview_explore.html" class="nav-link">2. Explore</a>
+            <a href="preview_detail.html" class="nav-link">3. Detail</a>
+            <a href="preview_map.html" class="nav-link">4. Map</a>
+            <a href="preview_saved.html" class="nav-link">5. Saved</a>
+            <a href="preview_saved_empty.html" class="nav-link">6. Empty</a>
+        </nav>
+
+        <div style="font-size: 11px; color: #8DA99A;">Pixel 7 • 390×844</div>
+    </header>
+
+    <div class="container">
+        <div class="meta-header">
+            <div class="meta-title">VerdantIntroScreenPreview</div>
+            <div class="meta-badge">IntroUiState</div>
+        </div>
+
+        <div class="phone-frame">
+            <div class="phone-inner">
+                <div class="camera-punch"></div>
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <div class="status-icons">
+                        <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L12 22l7.03-4.39C20.26 16.07 21 14.12 21 12c0-4.97-4.03-9-9-9z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.66-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M17 4h-3V2h-4v2H7v18h10V4z"/></svg>
+                    </div>
+                </div>
+
+                <div class="screen-scroll-view intro-screen-bg">
+                    <!-- Top Bar -->
+                    <div class="intro-top-bar">
+                        <div class="frosted-pill-badge">
+                            <div class="icon-bubble">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M15.5 11c0-2-1.5-3.5-3.5-3.5S8.5 9 8.5 11c0 1.25.62 2.34 1.56 3H9c-2.21 0-4 1.79-4 4h14c0-2.21-1.79-4-4-4h-1.06c.94-.66 1.56-1.75 1.56-3zm-3.5-1.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5S10.5 11.83 10.5 11s.67-1.5 1.5-1.5z"/>
+                                </svg>
+                            </div>
+                            <span>VERDANT ESTATES</span>
+                        </div>
+                        <div class="skip-tour-btn">Skip Tour</div>
+                    </div>
+
+                    <!-- Hero Visual -->
+                    <div class="intro-hero-visual">
+                        <div class="radar-ring outer"></div>
+                        <div class="radar-ring mid"></div>
+                        <div class="radar-disc"></div>
+
+                        <div class="central-sanctuary">
+                            <div class="villa-icon-squircle">
+                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0C2C1C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>
+                                    <line x1="8" y1="11" x2="11" y2="11"/>
+                                    <line x1="14" y1="13" x2="17" y2="13"/>
+                                </svg>
+                            </div>
+                            <div style="font-size: 11px; font-weight: 700; letter-spacing: 1.4px; color: #AFE4C7; margin-bottom: 3px;">PRIVATE RESERVE</div>
+                            <div style="font-family: var(--font-serif); font-size: 22px; font-weight: 700; color: #FFFFFF;">Austin Enclaves</div>
+                        </div>
+
+                        <div class="satellite-pill top-right">
+                            <div style="width: 8px; height: 8px; border-radius: 50%; background: #008955;"></div>
+                            <span>42 Curated Homes</span>
+                        </div>
+
+                        <div class="satellite-pill bottom-left">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#008955">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm4 0h-2v-4h2v4z"/>
+                            </svg>
+                            <span>LEED Platinum</span>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Floating Card -->
+                    <div class="intro-bottom-card">
+                        <div class="intro-stepper-row">
+                            <div style="background: #C3D5CA; border-radius: 50px; padding: 4px 10px; display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; font-weight: 700; color: #194935; letter-spacing: 0.5px;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                                ARCHITECTURAL EXCELLENCE
+                            </div>
+                            <div class="stepper-pill">
+                                <div class="step-bar"></div>
+                                <div class="step-dot"></div>
+                                <div class="step-dot"></div>
+                            </div>
+                        </div>
+
+                        <div class="intro-headline">Discover Nature's Most<br>Refined Living</div>
+                        <div class="intro-desc">Immerse yourself in handpicked eco-luxury estates, architectural sanctuaries, and off-market Austin reserves designed in harmony with nature.</div>
+
+                        <button class="btn-primary-pill">
+                            <span>Explore Estates</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                        </button>
+
+                        <div class="intro-footer-actions">
+                            <div style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                <img src="app/src/main/res/drawable/agent.png" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;" alt="Agent">
+                                <span style="font-size: 13px; font-weight: 600; color: var(--primary);">Talk to Advisor</span>
+                            </div>
+                            <div style="font-size: 13px; font-weight: 700; color: var(--primary); cursor: pointer;">
+                                Member Sign In
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="intro-subtext">Austin's Premier Sustainable Architecture Collective</div>
+                </div>
+
+                <div class="nav-home-bar"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
