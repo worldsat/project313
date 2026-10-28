@@ -9,6 +9,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.project313.data.model.NavigationTab
+import com.example.project313.ui.agent.AgentAdvisorScreen
+import com.example.project313.ui.agent.AgentAdvisorViewModel
 import com.example.project313.ui.detail.EstateDetailScreen
 import com.example.project313.ui.detail.EstateDetailViewModel
 import com.example.project313.ui.explore.ExploreEstatesScreen
@@ -38,6 +40,7 @@ fun NavHost(
     estateDetailViewModel: EstateDetailViewModel = viewModel(),
     mapExplorerViewModel: MapExplorerViewModel = viewModel(),
     savedPropertiesViewModel: SavedPropertiesViewModel = viewModel(),
+    agentAdvisorViewModel: AgentAdvisorViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
     val currentScreen by mainViewModel.currentScreen.collectAsState()
@@ -78,6 +81,7 @@ fun NavHost(
                                 when (event.tab) {
                                     NavigationTab.MAP -> mainViewModel.navigateToMap()
                                     NavigationTab.SAVED -> mainViewModel.navigateToSaved()
+                                    NavigationTab.AGENT -> mainViewModel.navigateToAgent()
                                     else -> exploreViewModel.onEvent(event)
                                 }
                             }
@@ -108,6 +112,7 @@ fun NavHost(
                                 when (event.tab) {
                                     NavigationTab.EXPLORE -> mainViewModel.navigateBack()
                                     NavigationTab.SAVED -> mainViewModel.navigateToSaved()
+                                    NavigationTab.AGENT -> mainViewModel.navigateToAgent()
                                     else -> mapExplorerViewModel.onEvent(event)
                                 }
                             }
@@ -134,7 +139,7 @@ fun NavHost(
                                     NavigationTab.EXPLORE -> mainViewModel.navigateBack()
                                     NavigationTab.MAP -> mainViewModel.navigateToMap()
                                     NavigationTab.SAVED -> {}
-                                    else -> savedPropertiesViewModel.onEvent(event)
+                                    NavigationTab.AGENT -> mainViewModel.navigateToAgent()
                                 }
                             }
                             else -> savedPropertiesViewModel.onEvent(event)
@@ -149,7 +154,22 @@ fun NavHost(
                             NavigationTab.EXPLORE -> mainViewModel.navigateBack()
                             NavigationTab.MAP -> mainViewModel.navigateToMap()
                             NavigationTab.SAVED -> {}
-                            else -> savedPropertiesViewModel.onEvent(SavedPropertiesUiEvent.OnNavigationTabSelected(tab))
+                            NavigationTab.AGENT -> mainViewModel.navigateToAgent()
+                        }
+                    }
+                )
+            }
+            is VerdantScreen.Agent -> {
+                val agentUiState by agentAdvisorViewModel.uiState.collectAsState()
+                AgentAdvisorScreen(
+                    uiState = agentUiState,
+                    onEvent = agentAdvisorViewModel::onEvent,
+                    onNavigateToTab = { tab ->
+                        when (tab) {
+                            NavigationTab.EXPLORE -> mainViewModel.navigateToExplore()
+                            NavigationTab.MAP -> mainViewModel.navigateToMap()
+                            NavigationTab.SAVED -> mainViewModel.navigateToSaved()
+                            NavigationTab.AGENT -> {}
                         }
                     }
                 )

@@ -35,6 +35,10 @@ class MainViewModel : ViewModel() {
         _currentScreen.update { VerdantScreen.Saved }
     }
 
+    fun navigateToAgent() {
+        _currentScreen.update { VerdantScreen.Agent }
+    }
+
     fun navigateBack() {
         _currentScreen.update { VerdantScreen.Explore }
     }

@@ -6,4 +6,5 @@ sealed class VerdantScreen {
     data class EstateDetail(val estateId: String = "the-glass-pavilions") : VerdantScreen()
     data object Map : VerdantScreen()
     data object Saved : VerdantScreen()
+    data object Agent : VerdantScreen()
 }
