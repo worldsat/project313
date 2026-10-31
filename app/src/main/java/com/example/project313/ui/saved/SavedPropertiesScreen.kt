@@ -63,6 +63,7 @@ fun SavedPropertiesScreen(
         bottomBar = {
             VerdantBottomNav(
                 selectedTab = NavigationTab.SAVED,
+                savedCount = uiState.totalSavedCount,
                 onTabSelect = onNavigateToTab
             )
         }

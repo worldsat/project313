@@ -63,6 +63,7 @@ fun MapExplorerScreen(
         bottomBar = {
             VerdantBottomNav(
                 selectedTab = NavigationTab.MAP,
+                savedCount = uiState.savedEstateIds.size,
                 onTabSelect = { tab ->
                     if (tab == NavigationTab.EXPLORE) {
                         onNavigateToExplore()
@@ -169,7 +170,7 @@ fun MapExplorerScreenPreview() {
                     com.example.project313.data.model.MapPin("skyline-botanica-penthouse", "$4.20M", 0.68f, 0.34f, latitude = 30.2610, longitude = -97.7405),
                     com.example.project313.data.model.MapPin("oakwood-sanctuary-cottage", "$1.45M", 0.24f, 0.41f, latitude = 30.3010, longitude = -97.7660)
                 ),
-                savedEstateIds = setOf("the-glass-pavilions")
+                savedEstateIds = MockData.savedEstates.map { it.id }.toSet()
             ),
             onEvent = {},
             onNavigateToDetail = {},

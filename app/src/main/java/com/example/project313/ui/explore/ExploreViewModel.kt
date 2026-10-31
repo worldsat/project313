@@ -20,7 +20,7 @@ class ExploreViewModel(
         ExploreUiState(
             featuredEstate = MockData.featuredEstate,
             popularEstates = MockData.popularEstates,
-            savedEstateIds = setOf("the-glass-pavilions")
+            savedEstateIds = MockData.savedEstates.map { it.id }.toSet()
         )
     )
     val uiState: StateFlow<ExploreUiState> = _uiState.asStateFlow()

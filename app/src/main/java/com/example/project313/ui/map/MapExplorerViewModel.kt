@@ -23,7 +23,7 @@ class MapExplorerViewModel : ViewModel() {
             pins = defaultPins,
             selectedEstateId = "the-glass-pavilions",
             selectedEstate = MockData.featuredEstate,
-            savedEstateIds = setOf("the-glass-pavilions")
+            savedEstateIds = MockData.savedEstates.map { it.id }.toSet()
         )
     )
     val uiState: StateFlow<MapExplorerUiState> = _uiState.asStateFlow()

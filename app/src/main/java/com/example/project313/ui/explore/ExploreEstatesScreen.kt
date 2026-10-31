@@ -51,6 +51,7 @@ fun ExploreEstatesScreen(
         bottomBar = {
             VerdantBottomNav(
                 selectedTab = uiState.currentNavigationTab,
+                savedCount = uiState.savedEstateIds.size,
                 onTabSelect = { onEvent(ExploreUiEvent.OnNavigationTabSelected(it)) }
             )
         }
@@ -158,7 +159,7 @@ fun ExploreScreenPreview() {
             uiState = ExploreUiState(
                 featuredEstate = MockData.featuredEstate,
                 popularEstates = MockData.popularEstates,
-                savedEstateIds = setOf("the-glass-pavilions"),
+                savedEstateIds = MockData.savedEstates.map { it.id }.toSet(),
                 selectedCategory = FilterCategory.ALL,
                 currentNavigationTab = NavigationTab.EXPLORE
             ),

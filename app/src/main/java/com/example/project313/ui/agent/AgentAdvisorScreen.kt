@@ -69,7 +69,8 @@ fun AgentAdvisorScreen(
     uiState: AgentAdvisorUiState,
     onEvent: (AgentAdvisorUiEvent) -> Unit,
     onNavigateToTab: (NavigationTab) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    savedCount: Int = MockData.savedEstates.size
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -87,6 +88,7 @@ fun AgentAdvisorScreen(
         bottomBar = {
             VerdantBottomNav(
                 selectedTab = NavigationTab.AGENT,
+                savedCount = savedCount,
                 onTabSelect = onNavigateToTab
             )
         }

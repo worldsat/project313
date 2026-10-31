@@ -161,8 +161,10 @@ fun NavHost(
             }
             is VerdantScreen.Agent -> {
                 val agentUiState by agentAdvisorViewModel.uiState.collectAsState()
+                val savedUiState by savedPropertiesViewModel.uiState.collectAsState()
                 AgentAdvisorScreen(
                     uiState = agentUiState,
+                    savedCount = savedUiState.totalSavedCount,
                     onEvent = agentAdvisorViewModel::onEvent,
                     onNavigateToTab = { tab ->
                         when (tab) {
@@ -191,7 +193,7 @@ fun NavHostPreview() {
             uiState = ExploreUiState(
                 featuredEstate = MockData.featuredEstate,
                 popularEstates = MockData.popularEstates,
-                savedEstateIds = setOf("the-glass-pavilions"),
+                savedEstateIds = MockData.savedEstates.map { it.id }.toSet(),
                 selectedCategory = FilterCategory.ALL,
                 currentNavigationTab = NavigationTab.EXPLORE
             ),
